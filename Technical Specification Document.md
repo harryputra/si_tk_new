@@ -168,7 +168,7 @@ Telah ditetapkan standar desain resmi sebagai acuan pengembangan fitur masa depa
 *   **System Runner Automation:** Implementasi dan verifikasi alur pengecekan sistem melalui `run.bat` yang mencakup validasi PHP, Composer, NPM, Docker Container, dan ketersediaan Port (8000 & 5173).
 *   **Vite HMR Conflict Handling:** Penanganan otomatis konflik port pada Vite dev server (auto-switch dari 5173 ke 5174) tervalidasi untuk memastikan integrasi Frontend tetap berjalan lancar.
 
-### 24. Production Deployment Architecture (trinpolman Standard)
+### 24. Production Deployment Architecture (trin-polman Standard)
 *   **Consolidated Container:** Menggunakan arsitektur single-container untuk Web (Nginx) dan App (PHP-FPM) yang dikelola oleh Supervisor. Hal ini memastikan integritas folder `vendor` dan performa yang lebih stabil.
 *   **Immutable Image:** Kode aplikasi dipaketkan langsung ke dalam Docker Image tanpa volume mount pada folder kode, menjamin konsistensi antara environment build dan runtime.
 *   **Service Stack:**
@@ -177,7 +177,15 @@ Telah ditetapkan standar desain resmi sebagai acuan pengembangan fitur masa depa
     *   `si_tk_redis`: Redis Cache & Session.
 *   **Cloudflare Integration:** Mendukung Real IP detection dan HTTPS termination via Cloudflare Tunnel.
 
+### 25. Production Stability & Bulletproof Seeding
+*   **Manual Faker Instantiation:** Mengganti helper `fake()` global dengan resolusi manual via `Illuminate\Container\Container` di level Factory. Strategi ini menjamin seeder data historis tetap berjalan stabil di environment produksi di mana dependensi `dev` (Faker) mungkin terinstal secara terbatas.
+*   **Force HTTPS Protocol:** Implementasi `URL::forceScheme('https')` pada `AppServiceProvider` untuk menjamin sinkronisasi protokol CSRF saat diakses melalui Cloudflare Tunnel.
+*   **Dependency Realignment:** Pemindahan `fakerphp/faker` ke blok `require` primer guna mendukung operasional seeding data simulasi secara langsung di server rumah.
+
+### 26. Operational Documentation
+*   **Admin Onboarding Guide:** Pembuatan panduan sekuensial (`dokumentasi-sistem-sim_tk.md`) yang mencakup alur setup awal dari Tahun Akademik hingga Pelaporan Keuangan untuk memastikan kelancaran transisi user administratif.
+
 ---
-*Updated: 2026-05-09 | Production Ready Architecture by Antigravity Architect*
+*Status: 🟢 Project Completed & Live | Updated: 2026-05-09 | Antigravity Architect*
 
 
