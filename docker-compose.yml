@@ -1,3 +1,5 @@
+name: si-tk
+
 services:
   # PHP Application
   app:
@@ -9,12 +11,14 @@ services:
     working_dir: /var/www
     volumes:
       - .:/var/www
-      - storage_data:/var/www/storage
+      - si_tk_storage:/var/www/storage
     depends_on:
-      - db
-      - redis
+      db:
+        condition: service_healthy
+      redis:
+        condition: service_started
     networks:
-      - sitk_network
+      - si_tk_net
 
   # Nginx Web Server
   web:
@@ -22,15 +26,15 @@ services:
     container_name: si_tk_web
     restart: unless-stopped
     ports:
-      - "80:80"
+      - "${HTTP_BIND:-0.0.0.0}:${HTTP_PORT:-8100}:80"
     volumes:
       - .:/var/www
       - ./docker/nginx/conf.d:/etc/nginx/conf.d
-      - storage_data:/var/www/storage
+      - si_tk_storage:/var/www/storage
     depends_on:
       - app
     networks:
-      - sitk_network
+      - si_tk_net
 
   # PostgreSQL Database
   db:
@@ -42,11 +46,16 @@ services:
       POSTGRES_USER: ${DB_USERNAME:-postgres}
       POSTGRES_PASSWORD: ${DB_PASSWORD:-secret}
     ports:
-      - "${DB_PORT_EXTERNAL:-5432}:5432"
+      - "127.0.0.1:${DB_PORT_EXTERNAL:-5434}:5432"
     volumes:
-      - pgdata:/var/lib/postgresql/data
+      - si_tk_dbdata:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U ${DB_USERNAME:-postgres}"]
+      interval: 5s
+      timeout: 5s
+      retries: 20
     networks:
-      - sitk_network
+      - si_tk_net
 
   # Redis for Cache & Session
   redis:
@@ -54,12 +63,12 @@ services:
     container_name: si_tk_redis
     restart: unless-stopped
     networks:
-      - sitk_network
+      - si_tk_net
 
 networks:
-  sitk_network:
+  si_tk_net:
     driver: bridge
 
 volumes:
-  pgdata:
-  storage_data:
+  si_tk_dbdata:
+  si_tk_storage:
