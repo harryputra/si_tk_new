@@ -12,16 +12,16 @@ class TeacherFactory extends Factory
     public function definition(): array
     {
         return [
-            'nip' => $this->faker->unique()->numerify('G###'),
-            'nama_lengkap' => $this->faker->name(),
-            'jabatan' => $this->faker->randomElement(['Guru Kelas', 'Guru Pendamping', 'Admin']),
-            'no_hp' => $this->faker->phoneNumber(),
-            'gaji_pokok' => $this->faker->randomElement([2000000, 2500000, 3000000]),
+            'nip' => fake()->unique()->numerify('G###'),
+            'nama_lengkap' => fake()->name(),
+            'jabatan' => fake()->randomElement(['Guru Kelas', 'Guru Pendamping', 'Admin']),
+            'no_hp' => fake()->phoneNumber(),
+            'gaji_pokok' => fake()->randomElement([2000000, 2500000, 3000000]),
             'bonus_hadir' => 10000,
             'denda_alfa' => 50000,
             'tunjangan_tetap' => 500000,
             'nama_bank' => 'BCA',
-            'nomor_rekening_bank' => $this->faker->bankAccountNumber(),
+            'nomor_rekening_bank' => fake()->bankAccountNumber(),
             'status' => 'aktif',
         ];
     }
