@@ -168,6 +168,16 @@ Telah ditetapkan standar desain resmi sebagai acuan pengembangan fitur masa depa
 *   **System Runner Automation:** Implementasi dan verifikasi alur pengecekan sistem melalui `run.bat` yang mencakup validasi PHP, Composer, NPM, Docker Container, dan ketersediaan Port (8000 & 5173).
 *   **Vite HMR Conflict Handling:** Penanganan otomatis konflik port pada Vite dev server (auto-switch dari 5173 ke 5174) tervalidasi untuk memastikan integrasi Frontend tetap berjalan lancar.
 
+### 24. Production Deployment Architecture (trinpolman Standard)
+*   **Consolidated Container:** Menggunakan arsitektur single-container untuk Web (Nginx) dan App (PHP-FPM) yang dikelola oleh Supervisor. Hal ini memastikan integritas folder `vendor` dan performa yang lebih stabil.
+*   **Immutable Image:** Kode aplikasi dipaketkan langsung ke dalam Docker Image tanpa volume mount pada folder kode, menjamin konsistensi antara environment build dan runtime.
+*   **Service Stack:**
+    *   `si_tk_app`: PHP 8.2 + Nginx + Supervisor (Port 8100).
+    *   `si_tk_db`: PostgreSQL 16 (Port internal 5432, Host 5434).
+    *   `si_tk_redis`: Redis Cache & Session.
+*   **Cloudflare Integration:** Mendukung Real IP detection dan HTTPS termination via Cloudflare Tunnel.
+
 ---
-*Updated: 2026-05-09 | Environment Stability Fix by Antigravity Architect*
+*Updated: 2026-05-09 | Production Ready Architecture by Antigravity Architect*
+
 
