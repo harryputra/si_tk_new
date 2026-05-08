@@ -11,17 +11,19 @@ class TeacherFactory extends Factory
 
     public function definition(): array
     {
+        $faker = $this->faker ?? \Illuminate\Container\Container::getInstance()->make(\Faker\Generator::class);
+
         return [
-            'nip' => \fake()->unique()->numerify('G###'),
-            'nama_lengkap' => \fake()->name(),
-            'jabatan' => \fake()->randomElement(['Guru Kelas', 'Guru Pendamping', 'Admin']),
-            'no_hp' => \fake()->phoneNumber(),
-            'gaji_pokok' => \fake()->randomElement([2000000, 2500000, 3000000]),
+            'nip' => $faker->unique()->numerify('G###'),
+            'nama_lengkap' => $faker->name(),
+            'jabatan' => $faker->randomElement(['Guru Kelas', 'Guru Pendamping', 'Admin']),
+            'no_hp' => $faker->phoneNumber(),
+            'gaji_pokok' => $faker->randomElement([2000000, 2500000, 3000000]),
             'bonus_hadir' => 10000,
             'denda_alfa' => 50000,
             'tunjangan_tetap' => 500000,
             'nama_bank' => 'BCA',
-            'nomor_rekening_bank' => \fake()->bankAccountNumber(),
+            'nomor_rekening_bank' => $faker->bankAccountNumber(),
             'status' => 'aktif',
         ];
     }
