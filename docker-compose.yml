@@ -1,17 +1,26 @@
-name: si-tk
+networks:
+  si_tk_net:
+    name: si_tk_net
+
+volumes:
+  si_tk_dbdata:
+    name: si_tk_dbdata
+  si_tk_storage:
+    name: si_tk_storage
 
 services:
-  # PHP Application
+  # --- PHP-FPM + NGINX (Integrated) ---
   app:
+    container_name: si_tk_app
     build:
       context: .
       dockerfile: Dockerfile
-    container_name: si_tk_app
     restart: unless-stopped
-    working_dir: /var/www
+    env_file: .env
+    ports:
+      - "${HTTP_PORT:-8100}:80"
     volumes:
-      - .:/var/www
-      - si_tk_storage:/var/www/storage
+      - si_tk_storage:/var/www/html/storage
     depends_on:
       db:
         condition: service_healthy
@@ -20,55 +29,31 @@ services:
     networks:
       - si_tk_net
 
-  # Nginx Web Server
-  web:
-    image: nginx:alpine
-    container_name: si_tk_web
-    restart: unless-stopped
-    ports:
-      - "${HTTP_BIND:-0.0.0.0}:${HTTP_PORT:-8100}:80"
-    volumes:
-      - .:/var/www
-      - ./docker/nginx/conf.d:/etc/nginx/conf.d
-      - si_tk_storage:/var/www/storage
-    depends_on:
-      - app
-    networks:
-      - si_tk_net
-
-  # PostgreSQL Database
+  # --- POSTGRESQL ---
   db:
-    image: postgres:16-alpine
     container_name: si_tk_db
+    image: postgres:16-alpine
     restart: unless-stopped
     environment:
       POSTGRES_DB: ${DB_DATABASE:-si_tk_attauhid}
       POSTGRES_USER: ${DB_USERNAME:-postgres}
-      POSTGRES_PASSWORD: ${DB_PASSWORD:-secret}
+      POSTGRES_PASSWORD: ${DB_PASSWORD:-postgres}
     ports:
       - "127.0.0.1:${DB_PORT_EXTERNAL:-5434}:5432"
     volumes:
       - si_tk_dbdata:/var/lib/postgresql/data
     healthcheck:
-      test: ["CMD-SHELL", "pg_isready -U ${DB_USERNAME:-postgres}"]
+      test: ["CMD-SHELL", "pg_isready -U ${DB_USERNAME:-postgres} -d ${DB_DATABASE:-si_tk_attauhid}"]
       interval: 5s
       timeout: 5s
-      retries: 20
+      retries: 5
     networks:
       - si_tk_net
 
-  # Redis for Cache & Session
+  # --- REDIS ---
   redis:
-    image: redis:alpine
     container_name: si_tk_redis
+    image: redis:alpine
     restart: unless-stopped
     networks:
       - si_tk_net
-
-networks:
-  si_tk_net:
-    driver: bridge
-
-volumes:
-  si_tk_dbdata:
-  si_tk_storage:
